@@ -3,6 +3,7 @@ package icfp2019
 import com.google.common.base.CharMatcher
 import com.google.common.base.Splitter
 import icfp2019.model.*
+import org.pcollections.PVector
 import org.pcollections.TreePVector
 import java.nio.file.Paths
 
@@ -10,18 +11,22 @@ fun loadProblem(problemNumber: Int): String {
     val path = Paths.get("problems/prob-${problemNumber.toString().padStart(3, padChar = '0')}.desc").toAbsolutePath()
     return path.toFile().readText()
 }
+typealias Cells = PVector<PVector<Node>>
 
-fun boardString(p: Problem, path: Set<Node> = setOf()): String {
+fun boardString(problem: Problem, path: Set<Node> = setOf()): String =
+    boardString(problem.map, problem.size, problem.startingPosition, path)
+
+fun boardString(cells: Cells, size: MapSize, startingPosition: Point, path: Set<Node> = setOf()): String {
     val lines = mutableListOf<String>()
-    for (y in (p.size.y - 1) downTo 0) {
-
-        val row = (0 until p.size.x).map { x ->
-            val node = p.map[x][y]
+    for (y in (size.y - 1) downTo 0) {
+        val row = (0 until size.x).map { x ->
+            val node = cells[x][y]
             when {
-                p.startingPosition == Point(x, y) -> '@'
+                node.hasTeleporterPlanted -> '*'
+                node.isWrapped -> 'w'
+                startingPosition == Point(x, y) -> '@'
                 node.isObstacle -> 'X'
                 node in path -> '|'
-                node.isWrapped -> 'w'
                 node.booster != null -> 'o'
                 else -> '.'
             }
@@ -33,7 +38,13 @@ fun boardString(p: Problem, path: Set<Node> = setOf()): String {
 
 fun printBoard(p: Problem, path: Set<Node> = setOf()) {
     println("${p.size}")
-    print(boardString(p, path))
+    print(boardString(p.map, p.size, p.startingPosition, path))
+    println()
+}
+
+fun printBoard(state: GameState, path: Set<Node> = setOf()) {
+    println("${state.mapSize}")
+    print(boardString(state.cells, state.mapSize, state.startingPoint, path))
     println()
 }
 
@@ -65,6 +76,7 @@ fun parseTestMap(map: String): Problem {
                 'w' -> Node(point, isObstacle = false, isWrapped = true)
                 '.' -> Node(point, isObstacle = false)
                 '@' -> Node(point, isObstacle = false)
+                '*' -> Node(point, isObstacle = false, hasTeleporterPlanted = true, isWrapped = true)
                 in Booster.parseChars -> Node(point, isObstacle = false, booster = Booster.fromChar(char))
                 else -> throw IllegalArgumentException("Unknown Char '$char'")
             }

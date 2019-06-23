@@ -1,7 +1,6 @@
 package icfp2019.analyzers
 
 import icfp2019.model.GameState
-import icfp2019.model.Point
 import icfp2019.model.RobotId
 import icfp2019.parseTestMap
 import icfp2019.printBoard
@@ -12,12 +11,10 @@ internal class ConservativeDistanceAnalyzerTests {
     @Test
     fun analyze() {
         val problem = parseTestMap(map)
+        val state = GameState(problem)
+
         printBoard(problem)
-        val analyzer = ConservativeDistanceAnalyzer.analyze(
-            GameState.gameStateOf(
-                problem
-            )
-        ).invoke(RobotId(0), GameState.gameStateOf(Point.origin()))
+        val analyzer = ConservativeDistanceAnalyzer.analyze(state).invoke(RobotId.first, state)
         val result = analyzer(problem.startingPosition)
         println(result.estimate)
         printBoard(problem, result.pathNodes)

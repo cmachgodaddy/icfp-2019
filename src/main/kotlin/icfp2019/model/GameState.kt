@@ -1,65 +1,34 @@
 package icfp2019.model
 
-import org.pcollections.PVector
-import org.pcollections.TreePVector
+import icfp2019.core.MapCells
+import icfp2019.core.update
 
-data class GameState(
-    val cells: PVector<PVector<Node>>,
+data class GameState private constructor(
+    val cells: MapCells,
     val mapSize: MapSize,
-    val robotState: Map<RobotId, RobotState>,
-    val teleportDestination: List<Point>,
-    val unusedBoosters: List<Booster>
+    val startingPoint: Point,
+    val robotState: Map<RobotId, RobotState> = initialRobotMap(startingPoint),
+    val teleportDestination: List<Point> = listOf(),
+    val unusedBoosters: List<Booster> = listOf()
 ) {
+    constructor(problem: Problem) : this(
+        initStartNodeWrap(problem.map, problem.startingPosition),
+        problem.size,
+        problem.startingPosition
+    )
+
     companion object {
-        // Helper for constructing a game state from minimal description
-        fun gameStateOf(startingPosition: Point) =
-            GameState(
-                TreePVector.empty(),
-                MapSize(0, 0),
-                mapOf(RobotId.first to RobotState(RobotId.first, startingPosition)),
-                listOf(),
-                listOf()
-            )
-
-        // Helper for constructing a game state from minimal description
-        fun gameStateOf(cells: PVector<PVector<Node>>, mapSize: MapSize, startingPosition: Point) =
-            GameState(
-                cells,
-                mapSize,
-                mapOf(RobotId.first to RobotState(RobotId.first, startingPosition)),
-                listOf(),
-                listOf()
-            )
-
-        // Construct an first game state from the problem spec
-        fun gameStateOf(problem: Problem) =
-            GameState(
-                problem.map,
-                problem.size,
-                mapOf(RobotId.first to RobotState(RobotId.first, problem.startingPosition)),
-                listOf(),
-                listOf()
-            )
-
-        fun gameStateOf(problem: Problem, startingPosition: Point) =
-            GameState(
-                problem.map,
-                problem.size,
-                mapOf(RobotId.first to RobotState(RobotId.first, startingPosition)),
-                listOf(),
-                listOf()
-            )
+        private fun initialRobotMap(point: Point) = mapOf(RobotId.first to RobotState(RobotId.first, point))
+        // HACK for now, wrap start node - find a better place for this??
+        private fun initStartNodeWrap(mapCells: MapCells, start: Point): MapCells {
+            return mapCells.update(start) {
+                copy(isWrapped = true)
+            }
+        }
     }
 
     fun isGameComplete(): Boolean {
-        cells.forEach {
-            it.forEach {
-                if (!it.isObstacle && !it.isWrapped) {
-                    return false
-                }
-            }
-        }
-        return true
+        return cells.flatten().all { it.isObstacle || it.isWrapped }
     }
 
     fun isInBoard(point: Point): Boolean {
@@ -78,6 +47,10 @@ data class GameState(
             throw ArrayIndexOutOfBoundsException("Access out of game board")
         }
         val newCells = cells.with(point.x, cells[point.x].with(point.y, value))
-        return GameState(newCells, mapSize, robotState, teleportDestination, unusedBoosters)
+        return copy(cells = newCells)
+    }
+
+    fun withRobotPosition(robotId: RobotId, point: Point): GameState {
+        return copy(robotState = robotState.plus(robotId to robotState.getValue(robotId).copy(currentPosition = point)))
     }
 }

@@ -43,7 +43,6 @@ object MoveAnalyzer : Analyzer<(RobotId, Action) -> Boolean> {
                         is Action.TeleportBack -> canTeleportTo(action.targetResetPoint)
                         Action.CloneRobot -> hasBooster(Booster.CloneToken) &&
                                 initialState.get(robotState.currentPosition).hasBooster(Booster.CloningLocation)
-                        Action.Initialize -> false
                     }
                 }
                 possible

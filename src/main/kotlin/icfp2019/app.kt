@@ -12,7 +12,7 @@ fun main(args: Array<String>) {
             println("Running " + it.name)
             val problem = parseDesc(it.readText())
             val solution = brain(problem, listOf(DFSStrategy), 1)
-            File(it.parent, "${it.nameWithoutExtension}.sol").writeBytes(solution.toByteArray())
+            File(it.parent, "${it.nameWithoutExtension}.sol").writeBytes(solution.toString().toByteArray())
         }
     }
 }

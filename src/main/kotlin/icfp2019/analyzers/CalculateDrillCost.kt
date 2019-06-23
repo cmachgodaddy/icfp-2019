@@ -8,8 +8,8 @@ import icfp2019.model.Node
 import icfp2019.model.RobotId
 import org.pcollections.PVector
 
-object CalculateDrillCost : Analyzer<List<Array<DrillState>>> {
-    override fun analyze(initialState: GameState): (robotId: RobotId, state: GameState) -> List<Array<DrillState>> {
+object CalculateDrillCost : Analyzer<List<List<DrillState>>> {
+    override fun analyze(initialState: GameState): (robotId: RobotId, state: GameState) -> List<List<DrillState>> {
 
         val currentGrid = buildDrillRequiredFromEachNode(initialState.cells)
         return { _, state ->
@@ -19,7 +19,7 @@ object CalculateDrillCost : Analyzer<List<Array<DrillState>>> {
         }
     }
 
-    private fun buildDrillRequiredFromEachNode(currentGrid: PVector<PVector<Node>>): Array<Array<Array<DrillState>>> {
+    private fun buildDrillRequiredFromEachNode(currentGrid: PVector<PVector<Node>>): List<List<List<DrillState>>> {
 
         val xMax = currentGrid.size
         val yMax = currentGrid[0].size
@@ -27,7 +27,7 @@ object CalculateDrillCost : Analyzer<List<Array<DrillState>>> {
         return currentGrid.mapIndexed { x, row ->
             row.mapIndexed { y, _ ->
                 if (!currentGrid[x][y].isObstacle) {
-                    arrayOf(DrillState(Direction.E, -1))
+                    listOf(DrillState(Direction.E, -1))
                 } else {
                     val rightDir =
                         (x until xMax).map {
@@ -58,14 +58,14 @@ object CalculateDrillCost : Analyzer<List<Array<DrillState>>> {
                         .count()
                     DrillState(Direction.D, downDir)
 
-                    arrayOf(
+                    listOf(
                         DrillState(Direction.R, rightDir),
                         DrillState(Direction.L, leftDir),
                         DrillState(Direction.U, upDir),
                         DrillState(Direction.D, downDir)
                     )
                 }
-            }.toTypedArray()
-        }.toTypedArray()
+            }
+        }
     }
 }

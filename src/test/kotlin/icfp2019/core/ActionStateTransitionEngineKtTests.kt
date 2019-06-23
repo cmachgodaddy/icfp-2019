@@ -1,6 +1,7 @@
 package icfp2019.core
 
 import icfp2019.model.*
+import icfp2019.printBoard
 import icfp2019.toProblem
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
@@ -14,7 +15,7 @@ internal class ActionStateTransitionEngineKtTests {
                         @.
                     """.toProblem()
         val startingPosition = problem.startingPosition
-        val startingState = GameState.gameStateOf(problem)
+        val startingState = GameState(problem)
         val upRightState = applyAction(startingState, RobotId.first, Action.MoveUp).let {
             applyAction(it, RobotId.first, Action.MoveRight)
         }
@@ -38,7 +39,7 @@ internal class ActionStateTransitionEngineKtTests {
     fun verifyPickupBooster() {
 
         val problem = "l@".toProblem()
-        val gameState = GameState.gameStateOf(problem)
+        val gameState = GameState(problem)
 
         Assertions.assertEquals(
             Node(Point.origin(), isObstacle = false, booster = Booster.Drill),
@@ -55,6 +56,85 @@ internal class ActionStateTransitionEngineKtTests {
     }
 
     @Test
+    fun verifyFastMove() {
+
+        val problem = """
+        ...XX
+        f....
+        @..XX
+    """.toProblem()
+        val gameState = GameState(problem)
+
+        val actions = listOf(
+            Action.MoveUp, Action.AttachFastWheels, Action.MoveRight, Action.MoveRight
+        )
+        val expectedProblem = """
+        ...XX
+        wwwww
+        w..XX
+    """.toProblem()
+
+        actions.applyTo(gameState).let { state ->
+            printBoard(state)
+            Assertions.assertEquals(expectedProblem.map, state.cells)
+        }
+    }
+
+    @Test
+    fun verifyDrill() {
+
+        val problem = """
+        ..X..
+        @lX..
+        ..X..
+    """.toProblem()
+        val gameState = GameState(problem)
+
+        val actions = listOf(
+            Action.MoveRight, Action.StartDrill, Action.MoveRight, Action.MoveRight, Action.MoveRight
+        )
+        val expectedProblem = """
+        ..X..
+        wwwww
+        ..X..
+    """.toProblem()
+
+        actions.applyTo(gameState).let { state ->
+            printBoard(state)
+            Assertions.assertEquals(expectedProblem.map, state.cells)
+        }
+    }
+
+    @Test
+    fun verifyTeleport() {
+
+        val problem = """
+        .....
+        r....
+        @....
+    """.toProblem()
+        val gameState = GameState(problem)
+
+        val actions = listOf(
+            Action.MoveUp, Action.MoveUp, Action.MoveRight, Action.MoveRight,
+            Action.MoveRight, Action.MoveRight, Action.PlantTeleportResetPoint,
+            Action.MoveDown, Action.MoveDown, Action.MoveLeft, Action.MoveLeft,
+            Action.TeleportBack(Point(4, 2)), Action.MoveLeft, Action.MoveDown,
+            Action.MoveLeft, Action.MoveLeft, Action.MoveDown
+        )
+        val expectedProblem = """
+        wwww*
+        wwwww
+        wwwww
+    """.toProblem()
+
+        actions.applyTo(gameState).let { state ->
+            printBoard(state)
+            Assertions.assertEquals(expectedProblem.map, state.cells)
+        }
+    }
+
+    @Test
     fun verifyWrapping() {
 
         val problem = """
@@ -62,10 +142,10 @@ internal class ActionStateTransitionEngineKtTests {
         .....
         @..XX
     """.toProblem()
-        val gameState = GameState.gameStateOf(problem)
+        val gameState = GameState(problem)
 
         val actions = listOf(
-            Action.Initialize, Action.MoveUp, Action.MoveUp,
+            Action.MoveUp, Action.MoveUp,
             Action.MoveRight, Action.MoveDown, Action.MoveDown,
             Action.MoveRight, Action.MoveUp, Action.MoveUp,
             Action.MoveDown, Action.MoveRight

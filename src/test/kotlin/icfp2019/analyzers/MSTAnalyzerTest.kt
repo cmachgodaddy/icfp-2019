@@ -9,16 +9,15 @@ class MSTAnalyzerTest {
 
     @Test
     fun testMinimumSpanningTree6Nodes() {
-        val problem = """
-            ..
-            ..
-            ..
+
+        val map3x2 = """
+            ..@
+            ...
         """.toProblem()
 
-        val gameState = GameState.gameStateOf(problem)
+        val gameState = GameState(map3x2)
 
-        val spanningTree = MSTAnalyzer
-            .analyze(gameState)(RobotId(0), gameState)
+        val spanningTree = MSTAnalyzer.analyze(gameState)(RobotId.first, gameState)
 
         val count = spanningTree.edges.size
         Assertions.assertEquals(count, 5)
@@ -26,16 +25,15 @@ class MSTAnalyzerTest {
 
     @Test
     fun testMinimumSpanningTree9Nodes() {
-        val problem = """
+        val map3x3 = """
             ...
             ...
             ...
         """.toProblem()
 
-        val gameState = GameState.gameStateOf(problem)
+        val gameState = GameState(map3x3)
 
-        val spanningTree = MSTAnalyzer
-            .analyze(gameState)(RobotId(0), GameState.gameStateOf(Point(0, 0)))
+        val spanningTree = MSTAnalyzer.analyze(gameState)(RobotId.first, gameState)
 
         val count = spanningTree.edges.size
         Assertions.assertEquals(count, 8)
