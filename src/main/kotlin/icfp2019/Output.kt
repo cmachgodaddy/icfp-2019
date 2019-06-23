@@ -1,5 +1,8 @@
 package icfp2019
 
+import icfp2019.model.Action
+import icfp2019.model.RobotId
+
 /*  
 A solution for a task
   prob-NNN.desc
@@ -25,13 +28,10 @@ The actions are encoded as follows:
   (unless it uses a drill), respects the rules of using boosters, and, upon finishing,
   leaves all reachablesquares of the map wrapped.
  */
-class Output {
-    companion object {
-        fun encodeActions(actions: Iterable<Action>): String =
-            actions.joinToString(separator = "") { it.toSolutionString() }
 
-        fun encodeRobotActions(robotActions: Map<RobotId, List<Action>>): String =
-            robotActions.entries.sortedBy { it.key.id }
-                .joinToString(separator = "#") { encodeActions(it.value) }
-    }
-}
+fun Iterable<Action>.encodeActions(): String =
+    joinToString(separator = "") { it.toSolutionString() }
+
+fun Map<RobotId, Iterable<Action>>.encodeActions(): String =
+    entries.sortedBy { it.key.id }
+        .joinToString(separator = "#") { it.value.encodeActions() }

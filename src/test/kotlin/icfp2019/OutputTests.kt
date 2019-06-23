@@ -1,5 +1,8 @@
 package icfp2019
 
+import icfp2019.model.Action
+import icfp2019.model.Point
+import icfp2019.model.RobotId
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -18,7 +21,7 @@ class OutputTests {
     fun testOutputOfOneRobot() {
         val actions = getListOfAction()
         val map = mapOf(RobotId(1) to actions)
-        val actualOutput = Output.encodeRobotActions(map)
+        val actualOutput = map.encodeActions()
 
         Assertions.assertEquals("SSAWWD", actualOutput)
     }
@@ -31,7 +34,7 @@ class OutputTests {
             RobotId(1) to actions,
             RobotId(2) to actions
         )
-        val actualOutput = Output.encodeRobotActions(map)
+        val actualOutput = map.encodeActions()
 
         Assertions.assertEquals("SSAWWD#SSAWWD", actualOutput)
     }
@@ -47,7 +50,7 @@ class OutputTests {
             RobotId(2) to actionPlus
         )
 
-        val actualOutput = Output.encodeRobotActions(map)
+        val actualOutput = map.encodeActions()
         Assertions.assertEquals("SSAWWDT(1,2)#SSAWWDT(1,2)", actualOutput)
     }
 
@@ -62,7 +65,7 @@ class OutputTests {
             RobotId(2) to actionPlus
         )
 
-        val actualOutput = Output.encodeRobotActions(map)
+        val actualOutput = map.encodeActions()
         Assertions.assertEquals("SSAWWDA(1,2)#SSAWWDA(1,2)", actualOutput)
     }
 }

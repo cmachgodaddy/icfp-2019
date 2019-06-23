@@ -1,5 +1,6 @@
 package icfp2019
 
+import icfp2019.model.Node
 import org.pcollections.PVector
 
 enum class Direction {

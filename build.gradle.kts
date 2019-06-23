@@ -16,12 +16,13 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(platform("org.junit:junit-bom:5.4.0"))
 
+    implementation("ca.umontreal.iro.simul:ssj:3.3.1")
     implementation("com.google.guava:guava:28.0-jre")
+    implementation("org.jgrapht:jgrapht-core:1.3.0")
     implementation("org.junit.jupiter:junit-jupiter")
     implementation("org.junit.jupiter:junit-jupiter-api")
     implementation("org.junit.jupiter:junit-jupiter-engine")
     implementation("org.pcollections:pcollections:3.0.3")
-    implementation("org.jgrapht:jgrapht-core:1.3.0")
 }
 
 spotless {
@@ -42,6 +43,13 @@ tasks.withType<Test>().configureEach {
 }
 
 tasks.register("run", JavaExec::class) {
+    classpath = sourceSets.getByName("main").runtimeClasspath
+
+    main = "icfp2019.AppKt"
+    args = listOf("problems/prob-003.desc")
+}
+
+tasks.register("runAll", JavaExec::class) {
     classpath = sourceSets.getByName("main").runtimeClasspath
 
     main = "icfp2019.AppKt"

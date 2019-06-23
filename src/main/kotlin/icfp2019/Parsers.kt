@@ -4,6 +4,7 @@ import com.google.common.base.CharMatcher
 import com.google.common.base.Splitter
 import com.google.common.collect.Range
 import com.google.common.collect.TreeRangeSet
+import icfp2019.model.*
 import org.pcollections.TreePVector
 
 class Splitters {
@@ -122,6 +123,6 @@ fun parseBoosters(boosters: String): List<ParsedBooster> {
     return Splitters.SEMI_SPLITTER
         .split(boosters)
         .map {
-            ParsedBooster(Booster.fromString(it[0]), parsePoint(it.substring(1)))
+            ParsedBooster(Booster.fromChar(it[0]), parsePoint(it.substring(1)))
         }
 }

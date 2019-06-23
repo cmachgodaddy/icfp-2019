@@ -1,5 +1,7 @@
 package icfp2019
 
+import icfp2019.model.*
+import icfp2019.strategies.DFSStrategy
 import java.io.File
 import java.nio.file.Paths
 
@@ -9,18 +11,10 @@ fun main(args: Array<String>) {
         if (it.isFile && it.extension.equals("desc")) {
             println("Running " + it.name)
             val problem = parseDesc(it.readText())
-            val solution = solve(problem)
+            val solution = brain(problem, listOf(DFSStrategy), 1)
             File(it.parent, "${it.nameWithoutExtension}.sol").writeBytes(solution.toByteArray())
         }
     }
-}
-
-fun solve(problem: Problem): String {
-    val strategy = BackTrackingStrategy()
-    val gameBoardOf = GameBoard.gameBoardOf(problem)
-    val gameState = GameState(gameBoardOf, listOf(RobotState(RobotId(0), problem.startingPosition)), listOf(), listOf())
-    val actions = strategy.getActions(gameState)
-    return Output.encodeRobotActions(actions)
 }
 
 fun constructObstacleMap(problem: Problem): Array<Array<Boolean>> {

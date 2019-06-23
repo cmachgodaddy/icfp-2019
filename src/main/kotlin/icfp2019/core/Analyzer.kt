@@ -1,8 +1,8 @@
 package icfp2019.core
 
-import icfp2019.GameBoard
-import icfp2019.GameState
+import icfp2019.model.GameState
+import icfp2019.model.RobotId
 
 interface Analyzer<T> {
-    fun analyze(map: GameBoard): (state: GameState) -> T
+    fun analyze(initialState: GameState): (robotId: RobotId, state: GameState) -> T
 }

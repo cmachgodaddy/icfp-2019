@@ -1,8 +1,8 @@
 package icfp2019.core
 
-import icfp2019.GameBoard
-import icfp2019.GameState
+import icfp2019.model.GameState
+import icfp2019.model.RobotId
 
 interface MoveSelector {
-    fun selectFrom(strategies: Iterable<Strategy>): (map: GameBoard) -> (state: GameState) -> Proposal
+    fun selectFrom(strategies: Iterable<Strategy>): (map: GameState) -> (robotId: RobotId, state: GameState) -> Proposal
 }
