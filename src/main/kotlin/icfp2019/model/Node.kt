@@ -13,4 +13,8 @@ data class Node(
         }
         return false
     }
+
+    fun isBooster(): Boolean {
+        return this.booster != null
+    }
 }

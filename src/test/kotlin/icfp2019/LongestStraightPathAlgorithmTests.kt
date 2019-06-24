@@ -15,7 +15,7 @@ class LongestStraightPathAlgorithmTests {
                     "(23,3),(23,4),(24,4),(24,3),(25,3),(25,7),(26,7),(26,13),(24,13),(24,14),(23,14),(23,13),(22,13),(22,14)," +
                     "(21,14),(21,13),(20,13)#X(16,25);L(19,19);F(4,30);F(17,21);B(4,31)"
 
-        val p = parseDesc(problem3Input)
+        val p = parseDesc(problem3Input, "Test")
         val ret = applyLongestStraightPathAlgorithm(p.map)
         printBoard(ret)
     }

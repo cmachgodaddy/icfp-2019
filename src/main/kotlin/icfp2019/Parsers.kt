@@ -37,7 +37,7 @@ fun parseObstacles(obstacles: String): List<List<Point>> {
         .map { parseEdges(it) }
 }
 
-fun parseDesc(problem: String): Problem {
+fun parseDesc(problem: String, name: String): Problem {
     val (mapEdges, startPosition, obstacles, boosters) = Splitters.HASH_SPLITTER.splitToList(problem)
     val startPoint = parsePoint(startPosition)
     val vertices = parseEdges(mapEdges)
@@ -111,6 +111,7 @@ fun parseDesc(problem: String): Problem {
                  task ::= map # point # obstacles # boosters
      */
     return Problem(
+        name,
         MapSize(maxX, maxY),
         startPoint,
         map = TreePVector.from(grid.map { TreePVector.from(it.toList()) })

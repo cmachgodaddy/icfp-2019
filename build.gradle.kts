@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.3.40"
     id("com.diffplug.gradle.spotless") version "3.23.1"
+    id("com.github.johnrengelman.shadow") version "5.0.0"
 }
 
 group = "icfp2019"

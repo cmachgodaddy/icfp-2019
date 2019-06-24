@@ -17,7 +17,7 @@ class ParserTests {
     fun simpleBoard() {
         val problem1Input = "(0,0),(6,0),(6,1),(8,1),(8,2),(6,2),(6,3),(0,3)#(0,0)##"
 
-        val problem = parseDesc(problem1Input)
+        val problem = parseDesc(problem1Input, "Test")
         /* 0 1 2 3 4 5 6 7
          2 . . . . . . X X
          1 . . . . . . . .
@@ -80,14 +80,14 @@ class ParserTests {
     @Test
     fun printProblem() {
         val problemInput = loadProblem(86)
-        printBoard(parseDesc(problemInput))
+        printBoard(parseDesc(problemInput, "Test"))
     }
 
     @Test
     fun testProblem3() {
         val problem3Input = loadProblem(3)
 
-        val p = parseDesc(problem3Input)
+        val p = parseDesc(problem3Input, "Test")
 
         val expectedBoard = "X X . . . . . . X X X X X X X X X X X X X X X X X X X\n" +
                 "X X . . . . . . X X X X X X X X X X X X X X X X X X X\n" +

@@ -10,7 +10,7 @@ class EatCloserThenFatherTests {
     fun testSimple() {
         val problem3Input = loadProblem(3)
 
-        val p = parseDesc(problem3Input)
+        val p = parseDesc(problem3Input, "Test")
         val gs = GameState(p).withRobotPosition(RobotId.first, Point(20, 0))
         val s = EatCloserThenFarther().compute(gs)
         val m1 = s(RobotId(0), gs)

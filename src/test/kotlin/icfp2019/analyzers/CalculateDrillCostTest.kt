@@ -15,7 +15,7 @@ class CalculateDrillCostTest {
     @Test
     fun testDrillCount() {
         val problem3Input = loadProblem(3)
-        val problem = parseDesc(problem3Input)
+        val problem = parseDesc(problem3Input, "Test")
         val gameState = GameState(problem).withRobotPosition(RobotId.first, Point.origin())
         val drillCost = CalculateDrillCost.analyze(gameState)(RobotId.first, gameState)
         val expected = listOf(

@@ -68,7 +68,7 @@ fun parseTestMap(map: String): Problem {
                 else null
             }
         }.flatten().find { it != null } ?: Point.origin()
-    return Problem(MapSize(width, height), startPoint, TreePVector.from((0 until width).map { x ->
+    return Problem("Test", MapSize(width, height), startPoint, TreePVector.from((0 until width).map { x ->
         TreePVector.from((0 until height).map { y ->
             val point = Point(x, y)
             when (val char = lines[y][x]) {

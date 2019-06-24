@@ -1,32 +1,29 @@
 package icfp2019.strategies
 
 import icfp2019.analyzers.GraphAnalyzer
-import icfp2019.analyzers.ShortestPathUsingFloydWarshall
+import icfp2019.analyzers.ShortestPathUsingDijkstra
 import icfp2019.core.Strategy
 import icfp2019.model.Action
 import icfp2019.model.GameState
 import icfp2019.model.Node
 import icfp2019.model.RobotId
-import org.jgrapht.Graph
 import org.jgrapht.GraphPath
 import org.jgrapht.graph.AsSubgraph
 import org.jgrapht.graph.DefaultEdge
-import org.jgrapht.traverse.DepthFirstIterator
+import org.jgrapht.traverse.BreadthFirstIterator
 import org.jgrapht.traverse.GraphIterator
 
-// Move to an open space and push moves onto a stack, if no moves available then backtrack using the stack
-object DFSStrategy : Strategy {
+object BFSStrategy : Strategy {
     override fun compute(initialState: GameState): (robotId: RobotId, state: GameState) -> Action {
+        val graph = GraphAnalyzer.analyze(initialState).invoke(RobotId(0), initialState)
         return { robotId, gameState ->
-            val graph: Graph<Node, DefaultEdge> = GraphAnalyzer.analyze(gameState).invoke(robotId, gameState)
-
             val currentPoint = gameState.robotState.values.first().currentPosition
-            val currentNode = gameState.get(currentPoint)
+            val currentNode = graph.vertexSet().filter { currentPoint == it.point }[0]
 
             val unwrappedGraph =
-                AsSubgraph(graph, graph.vertexSet().filter { it.isWrapped.not() }.plus(currentNode).toSet())
+                AsSubgraph(graph, graph.vertexSet().filter { gameState.get(it.point).isWrapped.not() }.plus(currentNode).toSet())
 
-            val it: GraphIterator<Node, DefaultEdge> = DepthFirstIterator(unwrappedGraph, currentNode)
+            val bfsIterator: GraphIterator<Node, DefaultEdge> = BreadthFirstIterator(unwrappedGraph, currentNode)
 
             val neighbors = currentNode.point.neighbors()
                 .filter { gameState.isInBoard(it) }
@@ -34,17 +31,17 @@ object DFSStrategy : Strategy {
             if (neighbors.any {
                     it.isWrapped.not() && it.isObstacle.not()
                 }) {
-                it.next() // move past currentNode
-                val neighbor = it.next().point
+                bfsIterator.next() // move past currentNode
+                val neighbor = bfsIterator.next().point
                 currentPoint.actionToGetToNeighbor(neighbor)
             } else {
-                val analyze = ShortestPathUsingFloydWarshall.analyze(initialState)
+                val analyze = ShortestPathUsingDijkstra.analyze(gameState)
                 val shortestPathAlgorithm = analyze(robotId, gameState)
 
                 val pathToClosestNode: GraphPath<Node, DefaultEdge> = unwrappedGraph.vertexSet()
                     .filter { it.point != currentNode.point }
                     .filter { it.isWrapped.not() }
-                    .map { shortestPathAlgorithm.getPath(currentNode, it) }
+                    .map { shortestPathAlgorithm.getPath(gameState.get(currentPoint), it) }
                     .minBy { it.length }!!
 
                 // pathToClosestNode.vertexList[0] is `currentNode`

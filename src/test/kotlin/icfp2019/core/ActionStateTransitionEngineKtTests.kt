@@ -47,10 +47,42 @@ internal class ActionStateTransitionEngineKtTests {
         )
 
         listOf(Action.MoveLeft).applyTo(gameState).let {
-            Assertions.assertIterableEquals(listOf(Booster.Drill), it.unusedBoosters)
+            Assertions.assertEquals(mapOf(Booster.Drill to 1), it.unusedBoosters)
             Assertions.assertEquals(
                 Node(Point.origin(), isObstacle = false, isWrapped = true, booster = null),
                 it.get(Point.origin())
+            )
+        }
+    }
+
+    @Test
+    fun verifyArmsAttach() {
+
+        val problem = "b@".toProblem()
+        val gameState = GameState(problem)
+
+        Assertions.assertEquals(
+            Node(Point.origin(), isObstacle = false, booster = Booster.ExtraArm),
+            gameState.get(Point.origin())
+        )
+
+        val pickupState = listOf(Action.MoveLeft).applyTo(gameState)
+        pickupState.run {
+            Assertions.assertEquals(1, boostersAvailable(Booster.ExtraArm))
+            Assertions.assertEquals(mapOf(Booster.ExtraArm to 1), this.unusedBoosters)
+            Assertions.assertEquals(
+                Node(Point.origin(), isObstacle = false, isWrapped = true, booster = null),
+                this.get(Point.origin())
+            )
+        }
+
+        val applyTo = listOf(Action.AttachManipulator(Point(2, 0))).applyTo(pickupState)
+        applyTo.run {
+            Assertions.assertEquals(0, boostersAvailable(Booster.ExtraArm))
+            val robot = robot(RobotId.first)
+            Assertions.assertEquals(
+                listOf(Point(1, 0), Point(1, 1), Point(1, -1), Point(2, 0)),
+                robot.armRelativePoints
             )
         }
     }
@@ -69,9 +101,9 @@ internal class ActionStateTransitionEngineKtTests {
             Action.MoveUp, Action.AttachFastWheels, Action.MoveRight, Action.MoveRight
         )
         val expectedProblem = """
-        ...XX
+        .wwXX
         wwwww
-        w..XX
+        wwwXX
     """.toProblem()
 
         actions.applyTo(gameState).let { state ->
@@ -94,9 +126,9 @@ internal class ActionStateTransitionEngineKtTests {
             Action.MoveRight, Action.StartDrill, Action.MoveRight, Action.MoveRight, Action.MoveRight
         )
         val expectedProblem = """
-        ..X..
+        ..Xww
         wwwww
-        ..X..
+        ..Xww
     """.toProblem()
 
         actions.applyTo(gameState).let { state ->
@@ -148,7 +180,7 @@ internal class ActionStateTransitionEngineKtTests {
             Action.MoveUp, Action.MoveUp,
             Action.MoveRight, Action.MoveDown, Action.MoveDown,
             Action.MoveRight, Action.MoveUp, Action.MoveUp,
-            Action.MoveDown, Action.MoveRight
+            Action.MoveDown
         )
         val expectedProblem = """
         wwwXX

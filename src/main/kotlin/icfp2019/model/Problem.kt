@@ -3,6 +3,7 @@ package icfp2019.model
 import org.pcollections.PVector
 
 data class Problem(
+    val name: String,
     val size: MapSize,
     val startingPosition: Point,
     val map: PVector<PVector<Node>>

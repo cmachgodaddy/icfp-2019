@@ -11,7 +11,7 @@ class DistanceToWallsTests {
     @Test
     fun testSimple() {
         val problem3Input = loadProblem(3)
-        val p = parseDesc(problem3Input)
+        val p = parseDesc(problem3Input, "Test")
         val robotId = RobotId.first
 
         val gs1 = GameState(p).withRobotPosition(robotId, Point(20, 0))

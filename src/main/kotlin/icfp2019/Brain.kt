@@ -18,9 +18,12 @@ fun strategySequence(
     return generateSequence(
         seed = initialGameState to initialAction,
         nextFunction = { (gameState, _) ->
-            val nextAction = strategy.compute(gameState)(robotId, gameState)
-            val nextState = applyAction(gameState, robotId, nextAction)
-            nextState to nextAction
+            if (gameState.isGameComplete()) null
+            else {
+                val nextAction = strategy.compute(gameState)(robotId, gameState)
+                val nextState = applyAction(gameState, robotId, nextAction)
+                nextState to nextAction
+            }
         }
     ).drop(1) // skip the initial state
 }
@@ -54,12 +57,13 @@ fun Sequence<Pair<GameState, Action>>.score(
         initial.first,
         initial.second,
         conservativeDistance.estimate,
-        strategy)
+        strategy
+    )
 }
 
 fun brainStep(
     initialGameState: GameState,
-    strategies: Iterable<Strategy>,
+    strategy: Strategy,
     maximumSteps: Int
 ): Pair<GameState, Map<RobotId, Action>> {
 
@@ -75,14 +79,10 @@ fun brainStep(
     while (!gameState.isGameComplete() && workingSet.isNotEmpty()) {
         // pick the minimum across all robot/strategy pairs
         val winner = workingSet
-            .flatMap { robotId ->
-                strategies
-                    .map { strategy ->
-                        strategySequence(gameState, strategy, robotId)
-                            .take(maximumSteps)
-                            .takeWhile { !it.first.isGameComplete() }
-                            .score(robotId, strategy)
-                    }
+            .map { robotId ->
+                strategySequence(gameState, strategy, robotId)
+                    .take(maximumSteps)
+                    .score(robotId, strategy)
             }
 
         val winner0 = winner.minBy { it.distanceEstimate }!!
@@ -99,19 +99,22 @@ fun brainStep(
 
 fun brain(
     problem: Problem,
-    strategies: Iterable<Strategy>,
+    strategy: Strategy,
     maximumSteps: Int
-): Solution {
-    var gameState = GameState(problem)
-    val actions = mutableMapOf<RobotId, List<Action>>()
-    while (!gameState.isGameComplete()) {
-        val (newState, newActions) = brainStep(gameState, strategies, maximumSteps)
+): Sequence<Solution> =
+    generateSequence(
+        seed = GameState(problem) to mapOf<RobotId, List<Action>>(),
+        nextFunction = { (gameState, actions) ->
+            if (gameState.isGameComplete()) {
+                null
+            } else {
+                val (newState, newActions) = brainStep(gameState, strategy, maximumSteps)
+                val mergedActions = actions.toMutableMap()
+                newActions.forEach { (robotId, action) ->
+                    mergedActions.merge(robotId, listOf(action)) { left, right -> left.plus(right) }
+                }
 
-        gameState = newState
-        newActions.forEach { (robotId, action) ->
-            actions.merge(robotId, listOf(action)) { left, right -> left.plus(right) }
+                newState to mergedActions.toMap()
+            }
         }
-    }
-
-    return Solution(actions.toMap())
-}
+    ).map { (_, actions) -> Solution(problem, actions) }

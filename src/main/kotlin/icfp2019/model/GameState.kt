@@ -9,7 +9,7 @@ data class GameState private constructor(
     val startingPoint: Point,
     val robotState: Map<RobotId, RobotState> = initialRobotMap(startingPoint),
     val teleportDestination: List<Point> = listOf(),
-    val unusedBoosters: List<Booster> = listOf()
+    val unusedBoosters: Map<Booster, Int> = mapOf()
 ) {
     constructor(problem: Problem) : this(
         initStartNodeWrap(problem.map, problem.startingPosition),
@@ -52,5 +52,13 @@ data class GameState private constructor(
 
     fun withRobotPosition(robotId: RobotId, point: Point): GameState {
         return copy(robotState = robotState.plus(robotId to robotState.getValue(robotId).copy(currentPosition = point)))
+    }
+
+    fun robot(robotId: RobotId): RobotState {
+        return this.robotState.getValue(robotId)
+    }
+
+    fun boostersAvailable(booster: Booster): Int {
+        return this.unusedBoosters.getOrDefault(booster, 0)
     }
 }
