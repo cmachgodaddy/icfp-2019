@@ -7,16 +7,41 @@ import org.pcollections.PVector
 import org.pcollections.TreePVector
 import java.nio.file.Paths
 
+fun String.toProblem(): Problem {
+    return parseTestMap(this)
+}
+
+fun GameState.toProblem(): Problem {
+    val nodes = this.board().map {
+        it.map { cell ->
+            val state = this.nodeState(cell.point)
+            Node(
+                cell.point,
+                isObstacle = cell.isObstacle,
+                isWrapped = state.isWrapped,
+                hasTeleporterPlanted = cell.hasTeleporterPlanted,
+                booster = state.booster
+            )
+        }
+    }
+
+    val grid = TreePVector.from<PVector<Node>>(nodes.map { TreePVector.from(it) })
+
+    return Problem(name = "result",
+        size = this.mapSize,
+        startingPosition = this.startingPoint,
+        map = grid)
+}
+
 fun loadProblem(problemNumber: Int): String {
     val path = Paths.get("problems/prob-${problemNumber.toString().padStart(3, padChar = '0')}.desc").toAbsolutePath()
     return path.toFile().readText()
 }
-typealias Cells = PVector<PVector<Node>>
 
-fun boardString(problem: Problem, path: Set<Node> = setOf()): String =
+fun boardString(problem: Problem, path: Set<Point> = setOf()): String =
     boardString(problem.map, problem.size, problem.startingPosition, path)
 
-fun boardString(cells: Cells, size: MapSize, startingPosition: Point, path: Set<Node> = setOf()): String {
+fun boardString(cells: List<List<Node>>, size: MapSize, startingPosition: Point, path: Set<Point> = setOf()): String {
     val lines = mutableListOf<String>()
     for (y in (size.y - 1) downTo 0) {
         val row = (0 until size.x).map { x ->
@@ -26,7 +51,7 @@ fun boardString(cells: Cells, size: MapSize, startingPosition: Point, path: Set<
                 node.isWrapped -> 'w'
                 startingPosition == Point(x, y) -> '@'
                 node.isObstacle -> 'X'
-                node in path -> '|'
+                node.point in path -> '|'
                 node.booster != null -> 'o'
                 else -> '.'
             }
@@ -36,20 +61,14 @@ fun boardString(cells: Cells, size: MapSize, startingPosition: Point, path: Set<
     return lines.joinToString(separator = "\n")
 }
 
-fun printBoard(p: Problem, path: Set<Node> = setOf()) {
+fun printBoard(p: Problem, path: Set<Point> = setOf()) {
     println("${p.size}")
     print(boardString(p.map, p.size, p.startingPosition, path))
     println()
 }
 
-fun printBoard(state: GameState, path: Set<Node> = setOf()) {
-    println("${state.mapSize}")
-    print(boardString(state.cells, state.mapSize, state.startingPoint, path))
-    println()
-}
-
-fun String.toProblem(): Problem {
-    return parseTestMap(this)
+fun printBoard(state: GameState, path: Set<Point> = setOf()) {
+    printBoard(state.toProblem(), path)
 }
 
 fun parseTestMap(map: String): Problem {

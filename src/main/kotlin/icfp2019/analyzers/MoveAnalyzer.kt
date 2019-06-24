@@ -9,9 +9,8 @@ object MoveAnalyzer : Analyzer<(RobotId, Action) -> Boolean> {
             { robotId, action ->
                 var possible = false
 
-                val robotState = gameState.robotState[robotId]
-                if (robotState != null &&
-                    initialState.isInBoard(robotState.currentPosition)
+                val robotState = gameState.robot(robotId)
+                if (initialState.isInBoard(robotState.currentPosition)
                 ) {
                     val cell = initialState.get(robotState.currentPosition)
 
@@ -42,7 +41,7 @@ object MoveAnalyzer : Analyzer<(RobotId, Action) -> Boolean> {
                         Action.PlantTeleportResetPoint -> hasBooster(Booster.Teleporter)
                         is Action.TeleportBack -> canTeleportTo(action.targetResetPoint)
                         Action.CloneRobot -> hasBooster(Booster.CloneToken) &&
-                                initialState.get(robotState.currentPosition).hasBooster(Booster.CloningLocation)
+                                initialState.nodeState(robotState.currentPosition).hasBooster(Booster.CloningLocation)
                     }
                 }
                 possible

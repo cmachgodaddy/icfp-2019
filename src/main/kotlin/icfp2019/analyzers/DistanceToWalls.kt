@@ -1,10 +1,9 @@
 package icfp2019.analyzers
 
 import icfp2019.core.Analyzer
+import icfp2019.model.BoardCells
 import icfp2019.model.GameState
-import icfp2019.model.Node
 import icfp2019.model.RobotId
-import org.pcollections.PVector
 
 data class Distance(val value: Int) : Comparable<Distance> {
     override fun compareTo(other: Distance): Int {
@@ -21,7 +20,7 @@ class DistanceToWalls : Analyzer<Distance> {
         val obstacleIdentifier: Distance = Distance(-1)
     }
 
-    private fun applyDistanceAlgorithm(map: PVector<PVector<Node>>): List<List<Distance>> {
+    private fun applyDistanceAlgorithm(map: BoardCells): List<List<Distance>> {
         val maxX = map.size
         val maxY = map[0].size
         val ret = map.mapIndexed { x, subArray ->
@@ -39,9 +38,9 @@ class DistanceToWalls : Analyzer<Distance> {
     }
 
     override fun analyze(initialState: GameState): (robotId: RobotId, state: GameState) -> Distance {
-        val distanceBoard = applyDistanceAlgorithm(initialState.cells)
+        val distanceBoard = applyDistanceAlgorithm(initialState.board())
         return { robotId, state ->
-            val robot = state.robotState[robotId]!!
+            val robot = state.robot(robotId)
             distanceBoard[robot.currentPosition.x][robot.currentPosition.y]
         }
     }

@@ -2,7 +2,7 @@ package icfp2019.model
 
 sealed class Booster {
     companion object {
-        private val mapping = mapOf(
+        val mapping = mapOf(
             'B' to ExtraArm,
             'F' to FastWheels,
             'L' to Drill,

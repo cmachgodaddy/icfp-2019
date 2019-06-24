@@ -16,7 +16,7 @@ class GetNumberOfWrappedOrNotTests {
         """.toProblem()
         val gameState = GameState(map3x2)
 
-        val columns = gameState.cells
+        val columns = gameState.board()
         Assertions.assertEquals(3, columns.size)
         Assertions.assertEquals(2, columns[0].size)
         Assertions.assertEquals(2, columns[1].size)

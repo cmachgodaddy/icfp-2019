@@ -1,10 +1,11 @@
 package icfp2019
 
 import icfp2019.core.Strategy
-import icfp2019.model.*
+import icfp2019.model.Action
+import icfp2019.model.GameState
+import icfp2019.model.RobotId
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-
 import java.util.*
 
 internal class BrainKtTest {
@@ -39,11 +40,10 @@ internal class BrainKtTest {
             state = result
 
             println(actions)
-            val problem0 = problem.copy(map = result.cells)
-            printBoard(problem0)
+            printBoard(result)
         }
 
-        Assertions.assertEquals(solution.map, state.cells)
+        Assertions.assertEquals(solution.map, state.toProblem().map)
     }
 
     private val init =

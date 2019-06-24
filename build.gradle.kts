@@ -16,6 +16,7 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(platform("org.junit:junit-bom:5.4.0"))
+    implementation(project(":thirdparty:galois-2.0"))
 
     implementation("ca.umontreal.iro.simul:ssj:3.3.1")
     implementation("com.google.guava:guava:28.0-jre")
@@ -63,4 +64,5 @@ tasks.register<Zip>("packageDistribution") {
 
     from("problems")
     include("*.sol")
+
 }

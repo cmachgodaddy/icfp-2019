@@ -9,7 +9,7 @@ data class WrappedUnwrapped(val wrapped: Int, val unwrapped: Int)
 object GetNumberOfWrappedOrNot : Analyzer<WrappedUnwrapped> {
     override fun analyze(initialState: GameState): (robotId: RobotId, state: GameState) -> WrappedUnwrapped {
         return { _, state ->
-            state.cells
+            state.boardState()
                 .flatten()
                 .map {
                     if (it.isWrapped) {
